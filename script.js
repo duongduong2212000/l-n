@@ -4,11 +4,11 @@ const playMusicBtn = document.getElementById("play-music");
 const bgMusic = document.getElementById("bg-music");
 const openSound = document.getElementById("open-sound");
 
-// Tỉ lệ
+// Prize probability
 const prizes = [
     { text: "1000 Naira", chance: 0.10 },
     { text: "2500 Naira", chance: 0.05 },
-    { text: "Hẹn lần sau!", chance: 0.10 },
+    { text: "Next Time!", chance: 0.10 },
     { text: "500 Naira", chance: 0.25 },
     { text: "800 Naira", chance: 0.25 },
     { text: "700 Naira", chance: 0.25 }
@@ -16,13 +16,13 @@ const prizes = [
 
 function getRandomPrize() {
     const r = Math.random();
-    let cumulative = 0;
+    let sum = 0;
 
     for (let p of prizes) {
-        cumulative += p.chance;
-        if (r < cumulative) return p.text;
+        sum += p.chance;
+        if (r < sum) return p.text;
     }
-    return "Hẹn lần sau!";
+    return "Next Time!";
 }
 
 function shuffle(arr) {
@@ -34,41 +34,41 @@ function renderEnvelopes() {
     const numbers = shuffle([1, 2, 3, 4, 5, 6]);
 
     numbers.forEach(num => {
-        const div = document.createElement("div");
-        div.className = "envelope";
-        div.textContent = num;
+        const envelope = document.createElement("div");
+        envelope.className = "envelope";
 
-        div.onclick = () => {
-            if (div.classList.contains("opened")) return;
+        envelope.innerHTML = `
+            <div class="envelope-inner">
+                <div class="envelope-front">${num}</div>
+                <div class="envelope-back"></div>
+            </div>
+        `;
 
-            // play sound
+        envelope.onclick = () => {
+            if (envelope.classList.contains("opened")) return;
+
             openSound.play();
 
-            // animation
-            div.classList.add("opened");
+            const prize = getRandomPrize();
+            envelope.querySelector(".envelope-back").textContent = prize;
 
-            setTimeout(() => {
-                div.textContent = getRandomPrize();
-            }, 300);
+            envelope.classList.add("opened");
         };
 
-        envelopeContainer.appendChild(div);
+        envelopeContainer.appendChild(envelope);
     });
 }
 
-playAgainBtn.onclick = () => {
-    renderEnvelopes();
-};
+playAgainBtn.onclick = () => renderEnvelopes();
 
 playMusicBtn.onclick = () => {
     if (bgMusic.paused) {
         bgMusic.play();
-        playMusicBtn.textContent = "Tắt Nhạc";
+        playMusicBtn.textContent = "Pause Music";
     } else {
         bgMusic.pause();
-        playMusicBtn.textContent = "Phát Nhạc";
+        playMusicBtn.textContent = "Play Music";
     }
 };
 
 renderEnvelopes();
-
